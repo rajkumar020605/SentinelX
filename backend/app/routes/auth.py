@@ -12,6 +12,7 @@ from app.security.jwt import create_access_token, get_current_user
 
 from fastapi.security import OAuth2PasswordRequestForm
 
+from app.security.roles import require_role
 
 router = APIRouter(
     prefix="/auth",
@@ -165,4 +166,15 @@ def login_for_swagger(
     return {
         "access_token": access_token,
         "token_type": "bearer"
+    }
+@router.get("/admin-test")
+def admin_test(
+    current_user: User = Depends(
+        require_role("admin")
+    )
+):
+    return {
+        "message": "Admin access granted",
+        "user": current_user.username,
+        "role": current_user.role
     }
