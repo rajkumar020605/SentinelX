@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from datetime import datetime, timezone
+from app.routes.auth import router as auth_router
 
 from app.database import Base, engine
 from app import models
@@ -12,6 +13,8 @@ app = FastAPI(
     description="AI-Assisted Security Monitoring and Incident Response Platform",
     version="1.0.0"
 )
+
+app.include_router(auth_router)
 
 
 @app.get("/")
