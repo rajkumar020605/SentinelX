@@ -34,12 +34,24 @@ def create_security_event(
     db.commit()
     db.refresh(new_event)
 
+    detection_result = None
+
+    if new_event.source_ip:
+        from app.detection.engine import run_detection
+
+        detection_result = run_detection(
+            db=db,
+            source_ip=new_event.source_ip,
+            username=new_event.username
+        )
+
     return {
         "message": "Security event recorded successfully",
         "event_id": new_event.id,
         "event_type": new_event.event_type,
         "severity": new_event.severity,
-        "created_by": current_user.username
+        "created_by": current_user.username,
+        "detection": detection_result
     }
 @router.get("/")
 def get_security_events(
