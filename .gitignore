@@ -1,6 +1,8 @@
-# Python cache
+# Python
 __pycache__/
 **/__pycache__/
+*.py[cod]
+*.pyo
 *.pyc
 
 # Virtual environments
@@ -9,7 +11,44 @@ venv/
 .venv/
 **/.venv/
 
+# Environment variables
+.env
+.env.*
+
 # SQLite database
 *.db
 *.sqlite
 *.sqlite3
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# SAM / AWS
+.aws-sam/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Secrets
+secrets/
+credentials/
