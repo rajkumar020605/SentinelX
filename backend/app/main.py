@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 from datetime import datetime, timezone
 
+from app.database import Base, engine
+from app import models
+
+Base.metadata.create_all(bind=engine)
+
+
 app = FastAPI(
     title="SentinelX Security Platform",
     description="AI-Assisted Security Monitoring and Incident Response Platform",
