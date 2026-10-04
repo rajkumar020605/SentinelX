@@ -13,6 +13,10 @@ class SecurityEvent(Base):
 
     source_ip = Column(String(45), nullable=True, index=True)
 
+    ioc_type = Column(String(30), nullable=True, index=True)
+
+    ioc_value = Column(String(500), nullable=True, index=True)
+
     username = Column(String(100), nullable=True, index=True)
 
     action = Column(String(100), nullable=True)

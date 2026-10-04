@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - Alerts</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>SentinelX</h2>
+            <p>Security Operations</p>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="security-events.html">
+                🛡️ Security Events
+            </a>
+
+            <a href="incidents.html">
+                🚨 Incidents
+            </a>
+
+            <a href="alerts.html" class="active">
+                🔔 Alerts
+            </a>
+
+            <a href="ml-anomalies.html">
+                🧠 ML Anomalies
+            </a>
+
+            <a href="mitre.html">
+                🎯 MITRE ATT&CK
+            </a>
+
+            <a href="reports.html">
+                📄 Reports
+            </a>
+
+        </nav>
+
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Alerts</h1>
+
+                <p>
+                    Monitor and manage security alerts
+                </p>
+
+            </div>
+
+            <div class="user-info">
+
+                👤
+                <span id="username">
+                    Analyst
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <section class="panel event-controls">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔍 Search alerts..."
+            >
+
+            <button onclick="loadAlerts()">
+                Refresh
+            </button>
+
+        </section>
+
+
+        <section class="panel events-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Security Alerts
+                </h2>
+
+                <span id="alertCount">
+                    Loading...
+                </span>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Title</th>
+
+                            <th>Incident ID</th>
+
+                            <th>Severity</th>
+
+                            <th>Risk Score</th>
+
+                            <th>Status</th>
+
+                            <th>Created</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="alertsTableBody">
+
+                        <tr>
+
+                            <td colspan="7">
+                                Loading alerts...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="js/alerts.js"></script>
+
+</body>
+
+</html>

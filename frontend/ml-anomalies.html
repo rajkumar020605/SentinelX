@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SentinelX - ML Anomalies</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>SentinelX</h2>
+
+            <p>
+                Security Operations
+            </p>
+
+        </div>
+
+
+        <nav>
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="security-events.html">
+                🛡️ Security Events
+            </a>
+
+            <a href="incidents.html">
+                🚨 Incidents
+            </a>
+
+            <a href="alerts.html">
+                🔔 Alerts
+            </a>
+
+            <a
+                href="ml-anomalies.html"
+                class="active"
+            >
+                🧠 ML Anomalies
+            </a>
+
+            <a href="mitre.html">
+                🎯 MITRE ATT&CK
+            </a>
+
+            <a href="reports.html">
+                📄 Reports
+            </a>
+
+        </nav>
+
+
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    ML Anomalies
+                </h1>
+
+                <p>
+                    AI-powered anomaly detection
+                    using Isolation Forest
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                👤
+
+                <span id="username">
+                    Analyst
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- ML SUMMARY -->
+
+        <section class="stats-grid">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🤖
+                </div>
+
+                <div>
+
+                    <p>
+                        Model
+                    </p>
+
+                    <h2 id="modelName">
+                        -
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <p>
+                        Events Analyzed
+                    </p>
+
+                    <h2 id="totalEvents">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+                <div>
+
+                    <p>
+                        Anomalies Detected
+                    </p>
+
+                    <h2 id="totalAnomalies">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚨
+                </div>
+
+                <div>
+
+                    <p>
+                        Incidents Created
+                    </p>
+
+                    <h2 id="totalIncidents">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- CONTROLS -->
+
+        <section class="panel event-controls">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔍 Search anomalies..."
+            >
+
+
+            <button
+                onclick="loadAnomalies()"
+            >
+                Run Scan
+            </button>
+
+        </section>
+
+
+        <!-- ANOMALIES TABLE -->
+
+        <section class="panel events-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Detected Anomalies
+                </h2>
+
+                <span id="anomalyCount">
+                    Loading...
+                </span>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Event ID
+                            </th>
+
+                            <th>
+                                Event Type
+                            </th>
+
+                            <th>
+                                Source IP
+                            </th>
+
+                            <th>
+                                IOC
+                            </th>
+
+                            <th>
+                                Severity
+                            </th>
+
+                            <th>
+                                Anomaly Level
+                            </th>
+
+                            <th>
+                                Risk Score
+                            </th>
+
+                            <th>
+                                Incident ID
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="anomaliesTableBody"
+                    >
+
+                        <tr>
+
+                            <td colspan="8">
+                                Loading anomalies...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script src="js/ml-anomalies.js"></script>
+
+</body>
+
+</html>

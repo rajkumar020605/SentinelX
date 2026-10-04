@@ -14,9 +14,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.security.roles import require_role
 
+from fastapi import Depends
+from app.security.rate_limit import rate_limit
+
 router = APIRouter(
     prefix="/auth",
-    tags=["Authentication"]
+    tags=["Authentication"],
+    dependencies=[Depends(rate_limit)]
 )
 
 

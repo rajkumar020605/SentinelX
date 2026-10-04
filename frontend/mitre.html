@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MITRE ATT&CK - SentinelX</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>🛡️ SentinelX</h2>
+            <p>SOC Platform</p>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="security-events.html">
+                🛡️ Security Events
+            </a>
+
+            <a href="incidents.html">
+                🚨 Incidents
+            </a>
+
+            <a href="alerts.html">
+                🔔 Alerts
+            </a>
+
+            <a href="ml-anomalies.html">
+                🧠 ML Anomalies
+            </a>
+
+            <a href="mitre.html" class="active">
+                🎯 MITRE ATT&CK
+            </a>
+
+            <a href="reports.html">
+                📄 Reports
+            </a>
+
+        </nav>
+
+        <button
+            class="logout-btn"
+            onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+                <h1>MITRE ATT&CK</h1>
+
+                <p>
+                    Detection rules mapped to MITRE ATT&CK techniques
+                </p>
+            </div>
+
+            <div class="user-info">
+                👤 <span id="username">Analyst</span>
+            </div>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+        <div class="event-controls">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔍 Search techniques..."
+            >
+
+            <button onclick="loadMitre()">
+                🔄 Refresh
+            </button>
+
+        </div>
+
+
+        <!-- MITRE PANEL -->
+        <div class="panel events-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    MITRE ATT&CK Technique Mappings
+                </h2>
+
+                <p id="mitreCount">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Detection Rule
+                            </th>
+
+                            <th>
+                                Technique ID
+                            </th>
+
+                            <th>
+                                Technique Name
+                            </th>
+
+                            <th>
+                                Tactic
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="mitreTableBody">
+
+                        <tr>
+
+                            <td colspan="5">
+                                Loading MITRE mappings...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="js/mitre.js"></script>
+
+</body>
+
+</html>

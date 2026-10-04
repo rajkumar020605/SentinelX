@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.security_event import SecurityEvent
 
+from app.models.threat_intelligence import ThreatIntelligence
 
 BRUTE_FORCE_THRESHOLD = 5
 BRUTE_FORCE_WINDOW_MINUTES = 10
@@ -86,4 +87,61 @@ def detect_suspicious_login(
         "severity": "low",
         "risk_score": 0,
         "message": "No suspicious login activity detected"
+    }
+def detect_threat_intelligence(
+    db: Session,
+    source_ip: str | None = None,
+    ioc_type: str | None = None,
+    ioc_value: str | None = None
+):
+    match_type = ioc_type
+    match_value = ioc_value
+
+    if not match_type and source_ip:
+        match_type = "ip"
+        match_value = source_ip
+
+    threat = (
+        db.query(ThreatIntelligence)
+        .filter(
+            ThreatIntelligence.ioc_type == match_type,
+            ThreatIntelligence.ioc_value == match_value
+        )
+        .first()
+    )
+
+    if threat:
+        threat_level = threat.threat_level.lower()
+
+        risk_map = {
+            "low": 30,
+            "medium": 50,
+            "high": 70,
+            "critical": 90
+        }
+
+        risk_score = risk_map.get(
+            threat_level,
+            50
+        )
+
+        return {
+            "detected": True,
+            "rule": "THREAT_INTELLIGENCE_MATCH",
+            "severity": threat_level,
+            "risk_score": risk_score,
+            "message": (
+                f"Threat intelligence match found for "
+                f"{match_value}. "
+                f"Threat level: {threat_level}. "
+                f"Source: {threat.source or 'Unknown'}."
+            )
+        }
+
+    return {
+        "detected": False,
+        "rule": "THREAT_INTELLIGENCE_MATCH",
+        "severity": "low",
+        "risk_score": 0,
+        "message": "No threat intelligence match found"
     }

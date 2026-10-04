@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports - SentinelX</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>🛡️ SentinelX</h2>
+            <p>SOC Platform</p>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="security-events.html">
+                🛡️ Security Events
+            </a>
+
+            <a href="incidents.html">
+                🚨 Incidents
+            </a>
+
+            <a href="alerts.html">
+                🔔 Alerts
+            </a>
+
+            <a href="ml-anomalies.html">
+                🧠 ML Anomalies
+            </a>
+
+            <a href="mitre.html">
+                🎯 MITRE ATT&CK
+            </a>
+
+            <a href="reports.html" class="active">
+                📄 Reports
+            </a>
+
+        </nav>
+
+        <button
+            class="logout-btn"
+            onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+                <h1>Security Reports</h1>
+
+                <p>
+                    SentinelX security monitoring reports
+                </p>
+            </div>
+
+            <div class="user-info">
+                👤 <span id="username">Analyst</span>
+            </div>
+
+        </div>
+
+
+        <!-- SUMMARY CARDS -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🛡️
+                </div>
+
+                <div>
+                    <p>Total Security Events</p>
+                    <h2 id="totalEvents">-</h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚨
+                </div>
+
+                <div>
+                    <p>Total Incidents</p>
+                    <h2 id="totalIncidents">-</h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔔
+                </div>
+
+                <div>
+                    <p>Total Alerts</p>
+                    <h2 id="totalAlerts">-</h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+                <div>
+                    <p>High/Critical Incidents</p>
+                    <h2 id="highCritical">-</h2>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REPORT ACTIONS -->
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Generate Reports
+                </h2>
+
+                <p>
+                    Download security data in different formats.
+                </p>
+
+            </div>
+
+
+            <div class="event-controls">
+
+                <button
+                    onclick="downloadCSV()">
+                    📥 Download CSV
+                </button>
+
+                <button
+                    onclick="downloadPDF()">
+                    📄 Download PDF
+                </button>
+
+                <button
+                    onclick="loadReport()">
+                    🔄 Refresh Report
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- INCIDENT STATUS -->
+        <div class="dashboard-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Incident Status
+                    </h2>
+
+                </div>
+
+                <div class="status-list">
+
+                    <div class="status-row">
+
+                        <span>
+                            Open
+                        </span>
+
+                        <strong id="openIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Investigating
+                        </span>
+
+                        <strong id="investigatingIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Resolved / Closed
+                        </span>
+
+                        <strong id="resolvedIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INCIDENT SEVERITY -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Incident Severity
+                    </h2>
+
+                </div>
+
+                <div class="status-list">
+
+                    <div class="status-row">
+
+                        <span>
+                            Critical
+                        </span>
+
+                        <strong id="criticalIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            High
+                        </span>
+
+                        <strong id="highIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Medium
+                        </span>
+
+                        <strong id="mediumIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Low
+                        </span>
+
+                        <strong id="lowIncidents">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ALERT STATUS -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Alert Status
+                    </h2>
+
+                </div>
+
+                <div class="status-list">
+
+                    <div class="status-row">
+
+                        <span>
+                            New
+                        </span>
+
+                        <strong id="newAlerts">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Acknowledged
+                        </span>
+
+                        <strong id="acknowledgedAlerts">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Resolved
+                        </span>
+
+                        <strong id="resolvedAlerts">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REPORT INFORMATION -->
+        <div class="panel" style="margin-top: 25px;">
+
+            <div class="panel-header">
+
+                <h2>
+                    Report Information
+                </h2>
+
+            </div>
+
+            <p>
+                Reports are generated from the SentinelX
+                security monitoring database.
+            </p>
+
+            <p style="margin-top: 10px; color: #64748b;">
+                Use CSV for data analysis and PDF for
+                professional security documentation.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="js/reports.js"></script>
+
+</body>
+
+</html>

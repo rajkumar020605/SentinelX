@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - SOC Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SentinelX</h2>
+                <p>Security Operations</p>
+            </div>
+
+           <nav>
+
+    <a href="dashboard.html" class="active">
+        📊 Dashboard
+    </a>
+
+    <a href="security-events.html">
+        🛡️ Security Events
+    </a>
+
+    <a href="incidents.html">
+        🚨 Incidents
+    </a>
+
+    <a href="alerts.html">
+        🔔 Alerts
+    </a>
+
+    <a href="ml-anomalies.html">
+        🧠 ML Anomalies
+    </a>
+
+    <a href="mitre.html">
+        🎯 MITRE ATT&CK
+    </a>
+
+    <a href="reports.html">
+        📄 Reports
+    </a>
+
+</nav>
+
+            <button class="logout-btn" onclick="logout()">
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <header class="topbar">
+
+                <div>
+                    <h1>SOC Dashboard</h1>
+                    <p>Security Monitoring & Incident Response</p>
+                </div>
+
+                <div class="user-info">
+                    👤 <span id="username">Analyst</span>
+                </div>
+
+            </header>
+
+
+            <!-- Statistics -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">🛡️</div>
+                    <div>
+                        <p>Security Events</p>
+                        <h2 id="totalEvents">--</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🚨</div>
+                    <div>
+                        <p>Incidents</p>
+                        <h2 id="totalIncidents">--</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔔</div>
+                    <div>
+                        <p>Alerts</p>
+                        <h2 id="totalAlerts">--</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div>
+                        <p>Open Incidents</p>
+                        <h2 id="openIncidents">--</h2>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- Dashboard Sections -->
+            <section class="dashboard-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Incident Status</h2>
+                    </div>
+
+                    <div class="status-list">
+
+                        <div class="status-row">
+                            <span>Open</span>
+                            <strong id="statusOpen">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>Investigating</span>
+                            <strong id="statusInvestigating">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>Resolved / Closed</span>
+                            <strong id="statusResolved">--</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Incident Severity</h2>
+                    </div>
+
+                    <div class="status-list">
+
+                        <div class="status-row">
+                            <span>🔴 Critical</span>
+                            <strong id="criticalCount">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>🟠 High</span>
+                            <strong id="highCount">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>🟡 Medium</span>
+                            <strong id="mediumCount">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>🟢 Low</span>
+                            <strong id="lowCount">--</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Alert Status</h2>
+                    </div>
+
+                    <div class="status-list">
+
+                        <div class="status-row">
+                            <span>New</span>
+                            <strong id="newAlerts">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>Acknowledged</span>
+                            <strong id="ackAlerts">--</strong>
+                        </div>
+
+                        <div class="status-row">
+                            <span>Resolved</span>
+                            <strong id="resolvedAlerts">--</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- System Status -->
+            <section class="system-status">
+
+                <div>
+                    <span class="online-dot"></span>
+                    SentinelX API
+                </div>
+
+                <span id="lastUpdated">
+                    Loading dashboard...
+                </span>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>

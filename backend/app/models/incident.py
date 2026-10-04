@@ -15,6 +15,18 @@ class Incident(Base):
 
     incident_type = Column(String(100), nullable=False)
 
+    detection_rule = Column(String(100), nullable=True)
+
+    source_ip = Column(String(45), nullable=True, index=True)
+
+    ioc_type = Column(String(30), nullable=True, index=True)
+
+    ioc_value = Column(String(500), nullable=True, index=True)
+
+    event_id = Column(Integer, nullable=True, index=True)
+
+    username = Column(String(100), nullable=True, index=True)
+
     severity = Column(String(20), default="medium", nullable=False)
 
     risk_score = Column(Integer, default=0, nullable=False)
@@ -22,6 +34,8 @@ class Incident(Base):
     status = Column(String(30), default="open", nullable=False)
 
     assigned_to = Column(Integer, nullable=True)
+
+    investigation_notes = Column(Text, nullable=True)
 
     created_at = Column(
         DateTime,
