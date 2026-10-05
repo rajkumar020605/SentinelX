@@ -7,228 +7,831 @@
     <title>SentinelX - SOC Dashboard</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .dashboard-bottom {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .risk-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .risk-row:last-child {
+            border-bottom: none;
+        }
+
+        .risk-row strong {
+            font-size: 20px;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-table th {
+            font-weight: 600;
+        }
+
+        .api-online {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .api-offline {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .refresh-btn {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-bottom {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="dashboard">
+<div class="dashboard">
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
+    <!-- ================= SIDEBAR ================= -->
 
-            <div class="logo">
-                <h2>SentinelX</h2>
-                <p>Security Operations</p>
+    <aside class="sidebar">
+
+        <h2>SentinelX</h2>
+
+        <p style="margin-bottom: 20px; color: #94a3b8;">
+            Security Operations Center
+        </p>
+
+        <nav>
+
+            <a href="dashboard.html" class="active">
+                🏠 Dashboard
+            </a>
+
+            <a href="security-events.html">
+                🛡️ Security Events
+            </a>
+
+            <a href="incidents.html">
+                🚨 Incidents
+            </a>
+
+            <a href="alerts.html">
+                🔔 Alerts
+            </a>
+
+            <a href="ml-anomalies.html">
+                🤖 ML Anomalies
+            </a>
+
+            <a href="mitre.html">
+                🎯 MITRE ATT&CK
+            </a>
+
+            <a href="reports.html">
+                📊 Reports
+            </a>
+
+            <a href="audit-logs.html">
+                📋 Audit Logs
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <div class="topbar">
+
+            <div>
+                <h1>SOC Dashboard</h1>
+
+                <p style="margin-top: 5px; color: #64748b;">
+                    SentinelX Security Monitoring & Incident Response
+                </p>
             </div>
 
-           <nav>
+            <div class="dashboard-actions">
 
-    <a href="dashboard.html" class="active">
-        📊 Dashboard
-    </a>
-
-    <a href="security-events.html">
-        🛡️ Security Events
-    </a>
-
-    <a href="incidents.html">
-        🚨 Incidents
-    </a>
-
-    <a href="alerts.html">
-        🔔 Alerts
-    </a>
-
-    <a href="ml-anomalies.html">
-        🧠 ML Anomalies
-    </a>
-
-    <a href="mitre.html">
-        🎯 MITRE ATT&CK
-    </a>
-
-    <a href="reports.html">
-        📄 Reports
-    </a>
-
-</nav>
-
-            <button class="logout-btn" onclick="logout()">
-                Logout
-            </button>
-
-        </aside>
-
-
-        <!-- Main Content -->
-        <main class="main-content">
-
-            <header class="topbar">
-
-                <div>
-                    <h1>SOC Dashboard</h1>
-                    <p>Security Monitoring & Incident Response</p>
-                </div>
-
-                <div class="user-info">
-                    👤 <span id="username">Analyst</span>
-                </div>
-
-            </header>
-
-
-            <!-- Statistics -->
-            <section class="stats-grid">
-
-                <div class="stat-card">
-                    <div class="stat-icon">🛡️</div>
-                    <div>
-                        <p>Security Events</p>
-                        <h2 id="totalEvents">--</h2>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">🚨</div>
-                    <div>
-                        <p>Incidents</p>
-                        <h2 id="totalIncidents">--</h2>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">🔔</div>
-                    <div>
-                        <p>Alerts</p>
-                        <h2 id="totalAlerts">--</h2>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">⚠️</div>
-                    <div>
-                        <p>Open Incidents</p>
-                        <h2 id="openIncidents">--</h2>
-                    </div>
-                </div>
-
-            </section>
-
-
-            <!-- Dashboard Sections -->
-            <section class="dashboard-grid">
-
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <h2>Incident Status</h2>
-                    </div>
-
-                    <div class="status-list">
-
-                        <div class="status-row">
-                            <span>Open</span>
-                            <strong id="statusOpen">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>Investigating</span>
-                            <strong id="statusInvestigating">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>Resolved / Closed</span>
-                            <strong id="statusResolved">--</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <h2>Incident Severity</h2>
-                    </div>
-
-                    <div class="status-list">
-
-                        <div class="status-row">
-                            <span>🔴 Critical</span>
-                            <strong id="criticalCount">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>🟠 High</span>
-                            <strong id="highCount">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>🟡 Medium</span>
-                            <strong id="mediumCount">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>🟢 Low</span>
-                            <strong id="lowCount">--</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <h2>Alert Status</h2>
-                    </div>
-
-                    <div class="status-list">
-
-                        <div class="status-row">
-                            <span>New</span>
-                            <strong id="newAlerts">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>Acknowledged</span>
-                            <strong id="ackAlerts">--</strong>
-                        </div>
-
-                        <div class="status-row">
-                            <span>Resolved</span>
-                            <strong id="resolvedAlerts">--</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- System Status -->
-            <section class="system-status">
-
-                <div>
-                    <span class="online-dot"></span>
-                    SentinelX API
-                </div>
-
-                <span id="lastUpdated">
-                    Loading dashboard...
+                <span id="apiStatus"
+                      class="api-online">
+                    🟢 SentinelX API
                 </span>
 
-            </section>
+                <button
+                    class="refresh-btn"
+                    onclick="loadDashboard()">
+                    🔄 Refresh
+                </button>
 
-        </main>
+            </div>
 
-    </div>
+        </div>
 
 
-    <script src="js/dashboard.js"></script>
+        <!-- ================= MAIN STAT CARDS ================= -->
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🛡️
+                </div>
+
+                <div>
+                    <p>Security Events</p>
+
+                    <h2 id="totalEvents">
+                        0
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚨
+                </div>
+
+                <div>
+                    <p>Incidents</p>
+
+                    <h2 id="totalIncidents">
+                        0
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔔
+                </div>
+
+                <div>
+                    <p>Alerts</p>
+
+                    <h2 id="totalAlerts">
+                        0
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+                <div>
+                    <p>Open Incidents</p>
+
+                    <h2 id="openIncidents">
+                        0
+                    </h2>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= INCIDENT STATUS ================= -->
+
+        <div class="card">
+
+            <h2>Incident Status</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Open</p>
+
+                        <h2 id="incidentOpen">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Investigating</p>
+
+                        <h2 id="incidentInvestigating">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Resolved / Closed</p>
+
+                        <h2 id="incidentResolved">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= INCIDENT SEVERITY ================= -->
+
+        <div class="card">
+
+            <h2>Incident Severity</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Critical</p>
+
+                        <h2 id="criticalIncidents">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>High</p>
+
+                        <h2 id="highIncidents">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Medium</p>
+
+                        <h2 id="mediumIncidents">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Low</p>
+
+                        <h2 id="lowIncidents">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= ALERT STATUS ================= -->
+
+        <div class="card">
+
+            <h2>Alert Status</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>New</p>
+
+                        <h2 id="newAlerts">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Acknowledged</p>
+
+                        <h2 id="acknowledgedAlerts">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div>
+                        <p>Resolved</p>
+
+                        <h2 id="resolvedAlerts">
+                            0
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= RISK + ACTIVITY ================= -->
+
+        <div class="dashboard-bottom">
+
+
+            <!-- RISK OVERVIEW -->
+
+            <div class="card">
+
+                <h2>Risk Overview</h2>
+
+                <div class="risk-row">
+
+                    <span>
+                        Critical Incidents
+                    </span>
+
+                    <strong id="criticalSummary">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="risk-row">
+
+                    <span>
+                        High Severity Incidents
+                    </span>
+
+                    <strong id="highSummary">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="risk-row">
+
+                    <span>
+                        Open Incidents
+                    </span>
+
+                    <strong id="openSummary">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="risk-row">
+
+                    <span>
+                        New Alerts
+                    </span>
+
+                    <strong id="newAlertSummary">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT ACTIVITY -->
+
+            <div class="card">
+
+                <h2>Recent Security Activity</h2>
+
+                <div class="table-container">
+
+                    <table class="activity-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Event</th>
+                                <th>Source IP</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="recentActivityBody">
+
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    class="empty-message">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LAST UPDATED ================= -->
+
+        <div
+            id="lastUpdated"
+            style="
+                margin-top: 20px;
+                color: #64748b;
+                text-align: right;
+            ">
+            Last updated: --
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- Existing dashboard JavaScript -->
+<script src="js/dashboard.js"></script>
+
+
+<!-- ================= DIRECT DASHBOARD LOADER ================= -->
+
+<script>
+
+async function loadMainDashboardCounts() {
+
+    const token =
+        localStorage.getItem("sentinelx_token");
+
+    if (!token) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/dashboard/summary",
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Dashboard API request failed"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        console.log(
+            "Dashboard API:",
+            data
+        );
+
+
+        /* =========================
+           MAIN COUNTS
+        ========================= */
+
+        document.getElementById(
+            "totalEvents"
+        ).textContent =
+            data.dashboard.total_security_events;
+
+        document.getElementById(
+            "totalIncidents"
+        ).textContent =
+            data.dashboard.total_incidents;
+
+        document.getElementById(
+            "totalAlerts"
+        ).textContent =
+            data.dashboard.total_alerts;
+
+
+        /* =========================
+           INCIDENT STATUS
+        ========================= */
+
+        document.getElementById(
+            "openIncidents"
+        ).textContent =
+            data.incident_status.open || 0;
+
+
+        document.getElementById(
+            "incidentOpen"
+        ).textContent =
+            data.incident_status.open || 0;
+
+
+        document.getElementById(
+            "incidentInvestigating"
+        ).textContent =
+            data.incident_status.investigating || 0;
+
+
+        document.getElementById(
+            "incidentResolved"
+        ).textContent =
+            data.incident_status.resolved_or_closed || 0;
+
+
+        /* =========================
+           INCIDENT SEVERITY
+        ========================= */
+
+        document.getElementById(
+            "criticalIncidents"
+        ).textContent =
+            data.incident_severity.critical || 0;
+
+
+        document.getElementById(
+            "highIncidents"
+        ).textContent =
+            data.incident_severity.high || 0;
+
+
+        document.getElementById(
+            "mediumIncidents"
+        ).textContent =
+            data.incident_severity.medium || 0;
+
+
+        document.getElementById(
+            "lowIncidents"
+        ).textContent =
+            data.incident_severity.low || 0;
+
+
+        /* =========================
+           ALERT STATUS
+        ========================= */
+
+        document.getElementById(
+            "newAlerts"
+        ).textContent =
+            data.alert_status.new || 0;
+
+
+        document.getElementById(
+            "acknowledgedAlerts"
+        ).textContent =
+            data.alert_status.acknowledged || 0;
+
+
+        document.getElementById(
+            "resolvedAlerts"
+        ).textContent =
+            data.alert_status.resolved || 0;
+
+
+        /* =========================
+           RISK OVERVIEW
+        ========================= */
+
+        document.getElementById(
+            "criticalSummary"
+        ).textContent =
+            data.incident_severity.critical || 0;
+
+
+        document.getElementById(
+            "highSummary"
+        ).textContent =
+            data.incident_severity.high || 0;
+
+
+        document.getElementById(
+            "openSummary"
+        ).textContent =
+            data.incident_status.open || 0;
+
+
+        document.getElementById(
+            "newAlertSummary"
+        ).textContent =
+            data.alert_status.new || 0;
+
+
+        /* =========================
+           RECENT EVENTS
+        ========================= */
+
+        const activityBody =
+            document.getElementById(
+                "recentActivityBody"
+            );
+
+        activityBody.innerHTML = "";
+
+
+        const events =
+            data.recent_events || [];
+
+
+        if (events.length === 0) {
+
+            activityBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        class="empty-message">
+                        No recent security events.
+                    </td>
+                </tr>
+            `;
+
+        } else {
+
+            events
+                .slice(0, 10)
+                .forEach(event => {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+                    row.innerHTML = `
+                        <td>
+                            ${event.event_type || "-"}
+                        </td>
+
+                        <td>
+                            ${event.source_ip || "-"}
+                        </td>
+
+                        <td>
+                            ${event.severity || "-"}
+                        </td>
+
+                        <td>
+                            ${event.status || "-"}
+                        </td>
+                    `;
+
+                    activityBody.appendChild(row);
+
+                });
+
+        }
+
+
+        /* =========================
+           API STATUS
+        ========================= */
+
+        const apiStatus =
+            document.getElementById(
+                "apiStatus"
+            );
+
+        apiStatus.textContent =
+            "🟢 SentinelX API";
+
+        apiStatus.className =
+            "api-online";
+
+
+        /* =========================
+           LAST UPDATED
+        ========================= */
+
+        document.getElementById(
+            "lastUpdated"
+        ).textContent =
+            "Last updated: " +
+            new Date().toLocaleString();
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+
+        const apiStatus =
+            document.getElementById(
+                "apiStatus"
+            );
+
+        apiStatus.textContent =
+            "🔴 SentinelX API - Offline";
+
+        apiStatus.className =
+            "api-offline";
+
+    }
+
+}
+
+
+/* Load dashboard */
+
+loadMainDashboardCounts();
+
+</script>
 
 </body>
 </html>

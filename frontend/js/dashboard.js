@@ -1,13 +1,13 @@
 const API_URL = "http://127.0.0.1:8000";
 
-const token = localStorage.getItem("sentinelx_token");
-
-if (!token) {
-    window.location.href = "login.html";
-}
-
-
 async function loadDashboard() {
+
+    const token = localStorage.getItem("sentinelx_token");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
 
     try {
 
@@ -22,7 +22,8 @@ async function loadDashboard() {
         );
 
         if (response.status === 401) {
-            logout();
+            localStorage.removeItem("sentinelx_token");
+            window.location.href = "login.html";
             return;
         }
 
@@ -34,116 +35,205 @@ async function loadDashboard() {
 
         console.log("Dashboard data:", data);
 
-        /* =========================
-           MAIN COUNTS
-        ========================= */
+        // =========================
+        // MAIN DASHBOARD COUNTS
+        // =========================
 
-        document.getElementById("totalEvents").textContent =
-            data.total_security_events;
+        setText(
+            "totalEvents",
+            data.dashboard.total_security_events
+        );
 
-        document.getElementById("totalIncidents").textContent =
-            data.total_incidents;
+        setText(
+            "totalIncidents",
+            data.dashboard.total_incidents
+        );
 
-        document.getElementById("totalAlerts").textContent =
-            data.total_alerts;
-
-
-        /* =========================
-           INCIDENT STATUS
-        ========================= */
-
-        const incidentStatus = data.incident_status || {};
-
-        document.getElementById("statusOpen").textContent =
-            incidentStatus.open || 0;
-
-        document.getElementById("statusInvestigating").textContent =
-            incidentStatus.investigating || 0;
-
-        document.getElementById("statusResolved").textContent =
-            incidentStatus.resolved_or_closed || 0;
-
-        document.getElementById("openIncidents").textContent =
-            incidentStatus.open || 0;
+        setText(
+            "totalAlerts",
+            data.dashboard.total_alerts
+        );
 
 
-        /* =========================
-           INCIDENT SEVERITY
-        ========================= */
+        // =========================
+        // OPEN INCIDENTS
+        // =========================
 
-        const severity = data.incident_severity || {};
-
-        document.getElementById("criticalCount").textContent =
-            severity.critical || 0;
-
-        document.getElementById("highCount").textContent =
-            severity.high || 0;
-
-        document.getElementById("mediumCount").textContent =
-            severity.medium || 0;
-
-        document.getElementById("lowCount").textContent =
-            severity.low || 0;
+        setText(
+            "openIncidents",
+            data.incident_status.open || 0
+        );
 
 
-        /* =========================
-           ALERT STATUS
-        ========================= */
+        // =========================
+        // INCIDENT STATUS
+        // =========================
 
-        const alertStatus = data.alert_status || {};
+        setText(
+            "incidentOpen",
+            data.incident_status.open || 0
+        );
 
-        document.getElementById("newAlerts").textContent =
-            alertStatus.new || 0;
+        setText(
+            "incidentInvestigating",
+            data.incident_status.investigating || 0
+        );
 
-        document.getElementById("ackAlerts").textContent =
-            alertStatus.acknowledged || 0;
+        setText(
+            "incidentResolved",
+            data.incident_status.resolved_or_closed || 0
+        );
 
-        document.getElementById("resolvedAlerts").textContent =
-            alertStatus.resolved || 0;
+
+        // =========================
+        // INCIDENT SEVERITY
+        // =========================
+
+        setText(
+            "criticalIncidents",
+            data.incident_severity.critical || 0
+        );
+
+        setText(
+            "highIncidents",
+            data.incident_severity.high || 0
+        );
+
+        setText(
+            "mediumIncidents",
+            data.incident_severity.medium || 0
+        );
+
+        setText(
+            "lowIncidents",
+            data.incident_severity.low || 0
+        );
 
 
-        /* =========================
-           USER
-        ========================= */
+        // =========================
+        // ALERT STATUS
+        // =========================
 
-        if (data.generated_for) {
-            document.getElementById("username").textContent =
-                data.generated_for;
+        setText(
+            "newAlerts",
+            data.alert_status.new || 0
+        );
+
+        setText(
+            "acknowledgedAlerts",
+            data.alert_status.acknowledged || 0
+        );
+
+        setText(
+            "resolvedAlerts",
+            data.alert_status.resolved || 0
+        );
+
+setText(
+    "criticalSummary",
+    data.incident_severity.critical || 0
+);
+
+setText(
+    "highSummary",
+    data.incident_severity.high || 0
+);
+
+setText(
+    "openSummary",
+    data.incident_status.open || 0
+);
+
+setText(
+    "newAlertSummary",
+    data.alert_status.new || 0
+);
+
+
+// Recent security activity
+
+const activityBody =
+    document.getElementById("recentActivityBody");
+
+if (activityBody) {
+
+    activityBody.innerHTML = "";
+
+    const events = data.recent_events || [];
+
+    events.slice(0, 10).forEach(event => {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${event.event_type || "-"}</td>
+            <td>${event.source_ip || "-"}</td>
+            <td>${event.severity || "-"}</td>
+            <td>${event.status || "-"}</td>
+        `;
+
+        activityBody.appendChild(row);
+    });
+}
+
+        // =========================
+        // API STATUS
+        // =========================
+
+        setText(
+            "apiStatus",
+            "SentinelX API"
+        );
+
+        const updated = document.getElementById(
+            "lastUpdated"
+        );
+
+        if (updated) {
+            updated.textContent =
+                "Last updated: " +
+                new Date().toLocaleTimeString();
         }
-
-
-        /* =========================
-           LAST UPDATED
-        ========================= */
-
-        document.getElementById("lastUpdated").textContent =
-            "Last updated: " + new Date().toLocaleTimeString();
-
 
     } catch (error) {
 
-        console.error("Dashboard error:", error);
+        console.error(
+            "Dashboard error:",
+            error
+        );
 
-        document.getElementById("lastUpdated").textContent =
-            "Unable to load dashboard data";
+        const status =
+            document.getElementById("apiStatus");
+
+        if (status) {
+            status.textContent =
+                "SentinelX API - Offline";
+        }
     }
 }
 
 
-/* =========================
-   LOGOUT
-========================= */
+// =========================
+// HELPER
+// =========================
 
-function logout() {
+function setText(id, value) {
 
-    localStorage.removeItem("sentinelx_token");
+    const element =
+        document.getElementById(id);
 
-    window.location.href = "login.html";
+    if (element) {
+        element.textContent =
+            value ?? 0;
+    }
 }
 
 
-/* =========================
-   LOAD DASHBOARD
-========================= */
+// =========================
+// LOAD DASHBOARD
+// =========================
 
-loadDashboard();
+document.addEventListener(
+    "DOMContentLoaded",
+    loadDashboard
+);

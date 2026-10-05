@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Audit Logs - SentinelX</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h2>SentinelX</h2>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="security-events.html">Security Events</a>
+            <a href="incidents.html">Incidents</a>
+            <a href="alerts.html">Alerts</a>
+            <a href="ml-anomalies.html">ML Anomalies</a>
+            <a href="mitre.html">MITRE ATT&CK</a>
+            <a href="reports.html">Reports</a>
+            <a href="audit-logs.html" class="active">Audit Logs</a>
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+
+        <div class="topbar">
+            <h1>Audit Logs</h1>
+
+            <button onclick="loadAuditLogs()">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <div class="card">
+
+            <h2>Security Activity History</h2>
+
+            <div id="message">
+                Loading audit logs...
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Action</th>
+                            <th>Resource</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="auditTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="js/audit-logs.js"></script>
+
+</body>
+</html>
