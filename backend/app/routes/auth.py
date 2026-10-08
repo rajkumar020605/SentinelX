@@ -182,22 +182,3 @@ def admin_test(
         "user": current_user.username,
         "role": current_user.role
     }
-@router.post("/promote-admin/{username}")
-def promote_admin(username: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == username).first()
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    user.role = "admin"
-    db.commit()
-    db.refresh(user)
-
-    return {
-        "message": "User promoted to admin",
-        "username": user.username,
-        "role": user.role
-    }
