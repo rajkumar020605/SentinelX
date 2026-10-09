@@ -84,6 +84,8 @@
             }
         }
     </style>
+    
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -360,6 +362,23 @@
             </div>
 
         </div>
+        
+<!-- ================= DASHBOARD CHARTS ================= -->
+<div class="dashboard-bottom">
+    <div class="card">
+        <h2>Incident Severity Distribution</h2>
+        <div style="height:280px;">
+            <canvas id="severityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Incident Status Distribution</h2>
+        <div style="height:280px;">
+            <canvas id="incidentStatusChart"></canvas>
+        </div>
+    </div>
+</div>
 
 
         <!-- ================= ALERT STATUS ================= -->
@@ -538,6 +557,7 @@
 
 
 <!-- Existing dashboard JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/dashboard.js"></script>
 
 
