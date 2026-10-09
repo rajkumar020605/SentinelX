@@ -204,48 +204,19 @@ function renderRecentAlerts(alerts) {
         return badge;
     }
 
-    alerts.slice(0, 10).forEach(alert => {
-        const row = document.createElement("tr");
+   const sortedAlerts = [...alerts].sort((a, b) => {
+    const dateA = Date.parse(
+        a.created_at || a.timestamp || a.createdAt || ""
+    );
+    const dateB = Date.parse(
+        b.created_at || b.timestamp || b.createdAt || ""
+    );
 
-        const titleCell = document.createElement("td");
-        titleCell.textContent =
-            alert.title ||
-            alert.name ||
-            alert.message ||
-            `Alert #${alert.id ?? "Unknown"}`;
+    return (Number.isNaN(dateB) ? 0 : dateB) -
+           (Number.isNaN(dateA) ? 0 : dateA);
+});
 
-        const severityCell = document.createElement("td");
-        severityCell.appendChild(
-            createBadge(
-                alert.severity || alert.priority || "Unknown",
-                "severity"
-            )
-        );
-
-        const statusCell = document.createElement("td");
-        statusCell.appendChild(
-            createBadge(alert.status || "Unknown", "status")
-        );
-
-        const createdCell = document.createElement("td");
-        const timestamp =
-            alert.created_at || alert.timestamp || alert.createdAt;
-
-        const parsedDate = timestamp ? Date.parse(timestamp) : NaN;
-
-        createdCell.textContent = Number.isNaN(parsedDate)
-            ? "Unknown"
-            : new Date(parsedDate).toLocaleString();
-
-        [titleCell, severityCell, statusCell, createdCell]
-            .forEach(cell => {
-                cell.style.padding = "12px";
-                cell.style.borderBottom = "1px solid #ddd";
-                row.appendChild(cell);
-            });
-
-        table.appendChild(row);
-    });
+sortedAlerts.slice(0, 10).forEach(alert => {
 }
 
 async function loadLiveAlerts() {
