@@ -347,4 +347,57 @@ function setText(id, value) {
 // LOAD DASHBOARD
 // =========================
 
+let securityEventsTrendChart = null;
+
+function updateSecurityEventsTrend(events) {
+    if (typeof Chart === "undefined") return;
+
+    const canvas = document.getElementById("securityEventsTrendChart");
+    if (!canvas) return;
+
+    // Group events by date
+    const counts = {};
+
+    events.forEach(event => {
+        const rawDate = event.created_at || event.timestamp;
+        if (!rawDate) return;
+
+        const date = new Date(rawDate);
+        if (Number.isNaN(date.getTime())) return;
+
+        const day = date.toLocaleDateString("en-CA");
+        counts[day] = (counts[day] || 0) + 1;
+    });
+
+    const labels = Object.keys(counts).sort();
+
+    if (securityEventsTrendChart) {
+        securityEventsTrendChart.destroy();
+    }
+
+    securityEventsTrendChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Security Events",
+                data: labels.map(day => counts[day]),
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37, 99, 235, 0.15)",
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+}
 document.addEventListener("DOMContentLoaded", loadDashboard);
