@@ -3,10 +3,11 @@ const API_URL = "https://sentinelx-csdo.onrender.com";
 
 let severityChartInstance = null;
 let incidentStatusChartInstance = null;
+let securityEventsTrendChart = null;
 
-// =========================
-// LOAD DASHBOARD DATA
-// =========================
+// =====================================
+// LOAD DASHBOARD
+// =====================================
 
 async function loadDashboard() {
     const token = localStorage.getItem("sentinelx_token");
@@ -38,81 +39,55 @@ async function loadDashboard() {
 
         const data = await response.json();
 
-        console.log("Dashboard data loaded.");
-
         const dashboard = data.dashboard || {};
         const severity = data.incident_severity || {};
         const status = data.incident_status || {};
         const alerts = data.alert_status || {};
 
-        // =========================
-        // MAIN DASHBOARD COUNTS
-        // =========================
-
+        // Main dashboard counts
         setText("totalEvents", dashboard.total_security_events);
         setText("totalIncidents", dashboard.total_incidents);
         setText("totalAlerts", dashboard.total_alerts);
         setText("openIncidents", status.open);
 
-        // =========================
-        // INCIDENT STATUS COUNTS
-        // =========================
-
+        // Incident status
         setText("incidentOpen", status.open);
         setText("incidentInvestigating", status.investigating);
         setText("incidentResolved", status.resolved_or_closed);
 
-        // =========================
-        // INCIDENT SEVERITY COUNTS
-        // =========================
-
+        // Incident severity
         setText("criticalIncidents", severity.critical);
         setText("highIncidents", severity.high);
         setText("mediumIncidents", severity.medium);
         setText("lowIncidents", severity.low);
 
-        // =========================
-        // ALERT STATUS COUNTS
-        // =========================
-
+        // Alert status
         setText("newAlerts", alerts.new);
         setText("acknowledgedAlerts", alerts.acknowledged);
         setText("resolvedAlerts", alerts.resolved);
 
-        // =========================
-        // RISK OVERVIEW
-        // =========================
-
+        // Risk overview
         setText("criticalSummary", severity.critical);
         setText("highSummary", severity.high);
         setText("openSummary", status.open);
         setText("newAlertSummary", alerts.new);
 
-        // =========================
-        // UPDATE CHARTS
-        // =========================
-
+        // Update existing charts
         updateDashboardCharts(data);
 
-        // =========================
-        // RECENT SECURITY ACTIVITY
-        // =========================
-
+        // Recent activity
         renderRecentActivity(data.recent_events || []);
 
-        // =========================
-        // API STATUS
-        // =========================
+        // Historical events trend
+        await loadHistoricalSecurityEventsTrend(token);
 
+        // API status
         if (apiStatus) {
-            apiStatus.textContent = "🟢 SentinelX API";
+            apiStatus.textContent = "SentinelX API - Online";
             apiStatus.className = "api-online";
         }
 
-        // =========================
-        // LAST UPDATED
-        // =========================
-
+        // Last updated
         const updated = document.getElementById("lastUpdated");
 
         if (updated) {
@@ -124,38 +99,19 @@ async function loadDashboard() {
         console.error("Dashboard error:", error);
 
         if (apiStatus) {
-            apiStatus.textContent = "🔴 SentinelX API - Offline";
+            apiStatus.textContent = "SentinelX API - Error";
             apiStatus.className = "api-offline";
-        }
-
-        const activityBody =
-            document.getElementById("recentActivityBody");
-
-        if (activityBody) {
-            activityBody.replaceChildren();
-
-            const row = document.createElement("tr");
-            const cell = document.createElement("td");
-
-            cell.colSpan = 4;
-            cell.className = "empty-message";
-            cell.textContent = "Unable to load recent activity.";
-
-            row.appendChild(cell);
-            activityBody.appendChild(row);
         }
     }
 }
 
-// =========================
-// UPDATE DASHBOARD CHARTS
-// =========================
+// =====================================
+// INCIDENT SEVERITY AND STATUS CHARTS
+// =====================================
 
 function updateDashboardCharts(data) {
     if (typeof Chart === "undefined") {
-        console.warn(
-            "Chart.js is unavailable. Check the Chart.js script in dashboard.html."
-        );
+        console.error("Chart.js is not loaded.");
         return;
     }
 
@@ -165,10 +121,7 @@ function updateDashboardCharts(data) {
     const severityCanvas = document.getElementById("severityChart");
     const statusCanvas = document.getElementById("incidentStatusChart");
 
-    // =========================
-    // INCIDENT SEVERITY BAR CHART
-    // =========================
-
+    // Severity bar chart
     if (severityCanvas) {
         if (severityChartInstance) {
             severityChartInstance.destroy();
@@ -176,10 +129,8 @@ function updateDashboardCharts(data) {
 
         severityChartInstance = new Chart(severityCanvas, {
             type: "bar",
-
             data: {
                 labels: ["Critical", "High", "Medium", "Low"],
-
                 datasets: [{
                     label: "Incidents",
                     data: [
@@ -198,36 +149,23 @@ function updateDashboardCharts(data) {
                     maxBarThickness: 65
                 }]
             },
-
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-
                 plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
+                    legend: { display: false }
                 },
-
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
+                        ticks: { precision: 0 }
                     }
                 }
             }
         });
     }
 
-    // =========================
-    // INCIDENT STATUS DOUGHNUT CHART
-    // =========================
-
+    // Incident status doughnut chart
     if (statusCanvas) {
         if (incidentStatusChartInstance) {
             incidentStatusChartInstance.destroy();
@@ -235,14 +173,12 @@ function updateDashboardCharts(data) {
 
         incidentStatusChartInstance = new Chart(statusCanvas, {
             type: "doughnut",
-
             data: {
                 labels: [
                     "Open",
                     "Investigating",
                     "Resolved / Closed"
                 ],
-
                 datasets: [{
                     label: "Incidents",
                     data: [
@@ -255,24 +191,18 @@ function updateDashboardCharts(data) {
                         "#2563eb",
                         "#16a34a"
                     ],
-                    borderColor: "#ffffff",
                     borderWidth: 2,
                     hoverOffset: 8
                 }]
             },
-
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: "62%",
-
                 plugins: {
                     legend: {
                         display: true,
                         position: "bottom"
-                    },
-                    tooltip: {
-                        enabled: true
                     }
                 }
             }
@@ -280,9 +210,228 @@ function updateDashboardCharts(data) {
     }
 }
 
-// =========================
-// RENDER RECENT ACTIVITY SAFELY
-// =========================
+// =====================================
+// HISTORICAL SECURITY EVENTS
+// =====================================
+
+async function loadHistoricalSecurityEventsTrend(token) {
+    const canvas = document.getElementById("securityEventsTrendChart");
+
+    if (!canvas) {
+        console.warn(
+            "Trend chart canvas is missing from dashboard.html."
+        );
+        return;
+    }
+
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js is not loaded.");
+        return;
+    }
+
+    try {
+        const allEvents = [];
+        const pageSize = 100;
+        let page = 1;
+        const maxPages = 1000;
+
+        while (page <= maxPages) {
+            const url = new URL(`${API_URL}/security-events/`);
+            url.searchParams.set("page", String(page));
+            url.searchParams.set("page_size", String(pageSize));
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 401) {
+                localStorage.removeItem("sentinelx_token");
+                window.location.href = "login.html";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    `Security events API failed: ${response.status}`
+                );
+            }
+
+            const result = await response.json();
+
+            // Support a direct array or common paginated formats.
+            const events = Array.isArray(result)
+                ? result
+                : Array.isArray(result.items)
+                    ? result.items
+                    : Array.isArray(result.events)
+                        ? result.events
+                        : Array.isArray(result.results)
+                            ? result.results
+                            : null;
+
+            if (!events) {
+                throw new Error(
+                    "Unexpected security-events response format."
+                );
+            }
+
+            allEvents.push(...events);
+
+            if (events.length < pageSize) {
+                break;
+            }
+
+            page++;
+        }
+
+        if (page > maxPages) {
+            console.warn("Stopped pagination at the safety limit.");
+        }
+
+        renderSecurityEventsTrend(allEvents);
+
+        console.log(
+            `Trend chart processed ${allEvents.length} security events.`
+        );
+
+    } catch (error) {
+        console.error("Security events trend error:", error);
+    }
+}
+
+// =====================================
+// RENDER LAST 30 DAYS TREND CHART
+// =====================================
+
+function renderSecurityEventsTrend(events) {
+    const canvas = document.getElementById("securityEventsTrendChart");
+
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    const dailyCounts = {};
+
+    // Count events by their creation date.
+    events.forEach(event => {
+        const rawDate =
+            event.created_at ||
+            event.timestamp ||
+            event.event_time ||
+            event.createdAt;
+
+        if (!rawDate) {
+            return;
+        }
+
+        const date = new Date(rawDate);
+
+        if (Number.isNaN(date.getTime())) {
+            return;
+        }
+
+        // Use the local calendar date.
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const dateKey = `${year}-${month}-${day}`;
+
+        dailyCounts[dateKey] = (dailyCounts[dateKey] || 0) + 1;
+    });
+
+    // Prepare the last 30 calendar days, including zero-event days.
+    const labels = [];
+    const values = [];
+    const today = new Date();
+
+    for (let offset = 29; offset >= 0; offset--) {
+        const date = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() - offset
+        );
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const dateKey = `${year}-${month}-${day}`;
+
+        labels.push(
+            date.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric"
+            })
+        );
+
+        values.push(dailyCounts[dateKey] || 0);
+    }
+
+    if (securityEventsTrendChart) {
+        securityEventsTrendChart.destroy();
+    }
+
+    securityEventsTrendChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Security Events",
+                data: values,
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37, 99, 235, 0.15)",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: "index"
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "top"
+                },
+                tooltip: {
+                    enabled: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    },
+                    title: {
+                        display: true,
+                        text: "Number of Events"
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Date"
+                    },
+                    ticks: {
+                        maxTicksLimit: 10
+                    }
+                }
+            }
+        }
+    });
+}
+
+// =====================================
+// RECENT SECURITY ACTIVITY TABLE
+// =====================================
 
 function renderRecentActivity(events) {
     const activityBody =
@@ -319,6 +468,7 @@ function renderRecentActivity(events) {
 
         values.forEach(value => {
             const cell = document.createElement("td");
+
             cell.textContent =
                 value === null || value === undefined || value === ""
                     ? "-"
@@ -331,9 +481,9 @@ function renderRecentActivity(events) {
     });
 }
 
-// =========================
-// HELPER FUNCTION
-// =========================
+// =====================================
+// HELPER
+// =====================================
 
 function setText(id, value) {
     const element = document.getElementById(id);
@@ -343,61 +493,8 @@ function setText(id, value) {
     }
 }
 
-// =========================
-// LOAD DASHBOARD
-// =========================
+// =====================================
+// START DASHBOARD
+// =====================================
 
-let securityEventsTrendChart = null;
-
-function updateSecurityEventsTrend(events) {
-    if (typeof Chart === "undefined") return;
-
-    const canvas = document.getElementById("securityEventsTrendChart");
-    if (!canvas) return;
-
-    // Group events by date
-    const counts = {};
-
-    events.forEach(event => {
-        const rawDate = event.created_at || event.timestamp;
-        if (!rawDate) return;
-
-        const date = new Date(rawDate);
-        if (Number.isNaN(date.getTime())) return;
-
-        const day = date.toLocaleDateString("en-CA");
-        counts[day] = (counts[day] || 0) + 1;
-    });
-
-    const labels = Object.keys(counts).sort();
-
-    if (securityEventsTrendChart) {
-        securityEventsTrendChart.destroy();
-    }
-
-    securityEventsTrendChart = new Chart(canvas, {
-        type: "line",
-        data: {
-            labels,
-            datasets: [{
-                label: "Security Events",
-                data: labels.map(day => counts[day]),
-                borderColor: "#2563eb",
-                backgroundColor: "rgba(37, 99, 235, 0.15)",
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                }
-            }
-        }
-    });
-}
 document.addEventListener("DOMContentLoaded", loadDashboard);
