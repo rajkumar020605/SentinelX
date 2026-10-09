@@ -5,11 +5,15 @@ let severityChartInstance = null;
 let incidentStatusChartInstance = null;
 let securityEventsTrendChart = null;
 
+let dashboardLoading = false;
+
 // =====================================
 // LOAD DASHBOARD
 // =====================================
 
 async function loadDashboard() {
+    if (dashboardLoading) return;
+dashboardLoading = true;
     const token = localStorage.getItem("sentinelx_token");
 
     if (!token) {
@@ -20,11 +24,36 @@ async function loadDashboard() {
     const apiStatus = document.getElementById("apiStatus");
 
     try {
-        const response = await fetch(`${API_URL}/dashboard/summary`, {
+        
+let response;
+let lastError;
+
+for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+        response = await fetch(`${API_URL}/dashboard/summary`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`
             }
+        });
+
+        break;
+    } catch (error) {
+        lastError = error;
+
+        console.warn(
+            `Dashboard request failed (attempt ${attempt}/3)`
+        );
+
+        if (attempt < 3) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+}
+
+if (!response) {
+    throw lastError || new Error("Dashboard API unavailable");
+}
         });
 
         if (response.status === 401) {
@@ -39,6 +68,7 @@ async function loadDashboard() {
 
         const data = await response.json();
 
+        renderRecentAlerts(data.recent_alerts || []);
         const dashboard = data.dashboard || {};
         const severity = data.incident_severity || {};
         const status = data.incident_status || {};
@@ -95,7 +125,7 @@ async function loadDashboard() {
                 "Last updated: " + new Date().toLocaleString();
         }
 
-    } catch (error) {
+     catch (error) {
         console.error("Dashboard error:", error);
 
         if (apiStatus) {
@@ -103,7 +133,169 @@ async function loadDashboard() {
             apiStatus.className = "api-offline";
         }
     }
+    finally {
+    dashboardLoading = false;
 }
+}
+
+function renderRecentAlerts(alerts) {
+    const table = document.getElementById("recentAlertsTable");
+    if (!table) return;
+
+    table.replaceChildren();
+
+    if (!Array.isArray(alerts) || alerts.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 4;
+        cell.textContent = "No recent alerts found.";
+        cell.style.padding = "12px";
+
+        row.appendChild(cell);
+        table.appendChild(row);
+        return;
+    }
+
+    function createBadge(value, type) {
+        const badge = document.createElement("span");
+        const normalized = String(value || "Unknown").toLowerCase();
+
+        badge.textContent = value || "Unknown";
+        badge.style.padding = "5px 10px";
+        badge.style.borderRadius = "12px";
+        badge.style.fontSize = "12px";
+        badge.style.fontWeight = "600";
+        badge.style.display = "inline-block";
+
+        let background = "#e5e7eb";
+        let color = "#374151";
+
+        if (type === "severity") {
+            if (normalized.includes("critical")) {
+                background = "#fee2e2";
+                color = "#991b1b";
+            } else if (normalized.includes("high")) {
+                background = "#ffedd5";
+                color = "#9a3412";
+            } else if (normalized.includes("medium")) {
+                background = "#fef3c7";
+                color = "#92400e";
+            } else if (normalized.includes("low")) {
+                background = "#dcfce7";
+                color = "#166534";
+            }
+        } else if (type === "status") {
+            if (normalized.includes("new")) {
+                background = "#dbeafe";
+                color = "#1d4ed8";
+            } else if (normalized.includes("acknowledged")) {
+                background = "#fef3c7";
+                color = "#92400e";
+            } else if (normalized.includes("resolved")) {
+                background = "#dcfce7";
+                color = "#166534";
+            }
+        }
+
+        badge.style.backgroundColor = background;
+        badge.style.color = color;
+
+        return badge;
+    }
+
+    alerts.slice(0, 10).forEach(alert => {
+        const row = document.createElement("tr");
+
+        const titleCell = document.createElement("td");
+        titleCell.textContent =
+            alert.title ||
+            alert.name ||
+            alert.message ||
+            `Alert #${alert.id ?? "Unknown"}`;
+
+        const severityCell = document.createElement("td");
+        severityCell.appendChild(
+            createBadge(
+                alert.severity || alert.priority || "Unknown",
+                "severity"
+            )
+        );
+
+        const statusCell = document.createElement("td");
+        statusCell.appendChild(
+            createBadge(alert.status || "Unknown", "status")
+        );
+
+        const createdCell = document.createElement("td");
+        const timestamp =
+            alert.created_at || alert.timestamp || alert.createdAt;
+
+        const parsedDate = timestamp ? Date.parse(timestamp) : NaN;
+
+        createdCell.textContent = Number.isNaN(parsedDate)
+            ? "Unknown"
+            : new Date(parsedDate).toLocaleString();
+
+        [titleCell, severityCell, statusCell, createdCell]
+            .forEach(cell => {
+                cell.style.padding = "12px";
+                cell.style.borderBottom = "1px solid #ddd";
+                row.appendChild(cell);
+            });
+
+        table.appendChild(row);
+    });
+}
+
+async function loadLiveAlerts() {
+    const token = localStorage.getItem("sentinelx_token");
+
+    if (!token) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/alerts/`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 401) {
+            localStorage.removeItem("sentinelx_token");
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Alerts API failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Support common API response formats
+        const alerts = Array.isArray(data)
+            ? data
+            : data.items || data.alerts || data.results || [];
+
+        console.log("Live alerts refreshed:", alerts.length);
+
+        // Refresh dashboard summary counts too
+        
+
+    } catch (error) {
+        console.error("Live alerts error:", error);
+    }
+}
+
+// Refresh alert data every 30 seconds
+setInterval(() => {
+    if (!document.hidden) {
+        loadLiveAlerts();
+    }
+}, 30000);
 
 // =====================================
 // INCIDENT SEVERITY AND STATUS CHARTS

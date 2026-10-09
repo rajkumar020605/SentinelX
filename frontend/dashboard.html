@@ -362,6 +362,7 @@
             </div>
 
         </div>
+  
         
 <!-- ================= DASHBOARD CHARTS ================= -->
 <div class="dashboard-bottom">
@@ -561,6 +562,32 @@
             Last updated: --
         </div>
 
+   
+<!-- Recent Security Alerts -->
+<div class="card" style="margin-top: 24px;">
+    <h2>Recent Security Alerts</h2>
+    <p>Latest alerts detected by SentinelX</p>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 12px;">Alert</th>
+                    <th style="text-align: left; padding: 12px;">Severity</th>
+                    <th style="text-align: left; padding: 12px;">Status</th>
+                    <th style="text-align: left; padding: 12px;">Created</th>
+                </tr>
+            </thead>
+            <tbody id="recentAlertsTable">
+                <tr>
+                    <td colspan="4" style="padding: 12px;">
+                        Loading alerts...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
     </main>
 
 </div>
