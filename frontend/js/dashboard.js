@@ -497,4 +497,34 @@ function setText(id, value) {
 // START DASHBOARD
 // =====================================
 
-document.addEventListener("DOMContentLoaded", loadDashboard);
+// Automatically load dashboard when the page opens
+document.addEventListener("DOMContentLoaded", () => {
+    loadDashboard();
+});
+
+// Refresh dashboard data every 30 seconds
+const DASHBOARD_REFRESH_INTERVAL = 30000;
+
+let dashboardRefreshTimer = null;
+
+function startDashboardAutoRefresh() {
+    if (dashboardRefreshTimer) {
+        clearInterval(dashboardRefreshTimer);
+    }
+
+    dashboardRefreshTimer = setInterval(() => {
+        if (!document.hidden) {
+            loadDashboard();
+        }
+    }, DASHBOARD_REFRESH_INTERVAL);
+}
+
+// Start automatic refresh
+startDashboardAutoRefresh();
+
+// Stop timer when the page is being unloaded
+window.addEventListener("beforeunload", () => {
+    if (dashboardRefreshTimer) {
+        clearInterval(dashboardRefreshTimer);
+    }
+});
